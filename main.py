@@ -1,6 +1,7 @@
 import os
 from parser import Parser
 import json
+import argparse
 
 
 def get_data_paths(ace2005_path):
@@ -32,7 +33,10 @@ def preprocessing(data_type, files):
 
 
 if __name__ == '__main__':
-    test_files, dev_files, train_files = get_data_paths('./data/ace_2005_td_v7/data/English')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', help="Path of ACE2005 English data", default='./data/ace_2005_td_v7/data/English')
+    args = parser.parse_args()
+    test_files, dev_files, train_files = get_data_paths(args.data)
     preprocessing('test', test_files)
     preprocessing('train', train_files)
     preprocessing('dev', dev_files)
