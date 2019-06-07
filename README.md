@@ -15,25 +15,21 @@ This is a simple code for preprocessing ACE 2005 corpus for Event Extraction tas
 
     ```bash
     python main.py --data=./data/ace_2005_td_v7/data/English
-    ```
-    
-    Then you can get parsed test/dev/train data in `output folder`.
-    ```
-    ├── output
-    │     └── test.json
-    │     └── dev.json
-    │     └── train.json
-    │...
-    ```
-    
+    ``` 
+    Then you can get the parsed data in `output directory`. 
     
 ## Output
 
-The results are generated in json format, like this sample. 
+### Format
+
+The results are generated in json format, like the bellow sample.
+
+Note that if there were multiple events in a sentence, they were divided into multiple instances per event.
 
 If you want to know event types and arguments in detail, read [this document (ACE 2005 event guidelines)](https://www.ldc.upenn.edu/sites/www.ldc.upenn.edu/files/english-events-guidelines-v5.4.3.pdf).
 
-### Sample
+
+**`sample.json`**
 ```json
 [{
     "sentence": "He visited all their families",
@@ -70,5 +66,25 @@ If you want to know event types and arguments in detail, read [this document (AC
 }]
 ```
 
-### Statistic
+
+### Data Split
+
+The resulting data is divided as follows.
+```
+├── output
+│     └── test.json
+│     └── dev.json
+│     └── train.json
+│...
+```
+
+We use the same data split as the previous work (Liu et al., 2016b; Nguyen et al., 2016). The data segmentation is specified in `data_list.csv`.
+
+Below is information about the amount of data.
+
+|       	| Documents 	| Event Mentions 	| Entity Mensions 	|
+|-------	|-----------	|----------------	|-----------------	|
+| Test  	| 40        	| 424            	| 4226            	|
+| Dev   	| 30        	| 505            	| 4050            	|
+| Train 	| 529       	| 4420           	| 53045           	|
 
