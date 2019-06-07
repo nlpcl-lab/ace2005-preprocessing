@@ -29,7 +29,7 @@ def preprocessing(data_type, files):
     for file in files:
         data.extend(Parser(xml_path=file).get_data())
     with open('output/{}.json'.format(data_type), 'w') as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=2)
 
 
 if __name__ == '__main__':

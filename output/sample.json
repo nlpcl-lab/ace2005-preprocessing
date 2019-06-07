@@ -1,0 +1,33 @@
+[{
+    "sentence": "He visited all their families",
+    "golden_entity_mentions": [
+      {
+        "text": "He",
+        "entity_type": "PER:Individual"
+      },
+      {
+        "text": "their",
+        "entity_type": "PER:Group"
+      },
+      {
+        "text": "all their families",
+        "entity_type": "PER:Group"
+      }
+    ],
+    "golden_event_mention": {
+      "trigger": "visited",
+      "arguments": [
+        {
+          "role": "Entity",
+          "entity_type": "PER:Individual",
+          "text": "He"
+        },
+        {
+          "role": "Entity",
+          "entity_type": "PER:Group",
+          "text": "all their families"
+        }
+      ],
+      "event_type": "Contact:Meet"
+    }
+}]
