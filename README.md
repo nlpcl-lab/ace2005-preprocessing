@@ -69,7 +69,7 @@ If you want to know event types and arguments in detail, read [this document (AC
 
 ### Data Split
 
-The resulting data is divided as follows.
+The resulting data is divided into test/dev/train as follows.
 ```
 ├── output
 │     └── test.json
