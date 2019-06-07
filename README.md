@@ -78,7 +78,7 @@ The resulting data is divided into test/dev/train as follows.
 │...
 ```
 
-We use the same data split as the previous work (Liu et al., 2016b; Nguyen et al., 2016). The data segmentation is specified in `data_list.csv`.
+This project use the same data split as the previous work (Liu et al., 2016b; Nguyen et al., 2016). The data segmentation is specified in `data_list.csv`.
 
 Below is information about the amount of data.
 
