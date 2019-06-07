@@ -1,6 +1,10 @@
 __pycache__/
 venv/
 .idea/
-data/dev.json
-data/train.json
-data/dev.json
+
+data/ace_2005_td_v7
+
+output/dev.json
+output/train.json
+output/dev.json
+
