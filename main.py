@@ -6,7 +6,7 @@ import json
 def get_data_paths(ace2005_path):
     test_files, dev_files, train_files = [], [], []
 
-    with open('./file_list.csv', mode='r') as csv_file:
+    with open('./data_list.csv', mode='r') as csv_file:
         rows = csv_file.readlines()
         for row in rows[1:]:
             items = row.replace('\n', '').split(',')
@@ -28,7 +28,7 @@ def preprocessing(data_type, files):
     for file in files:
         data.extend(Parser(xml_path=file).get_data())
     with open('output/{}.json'.format(data_type), 'w') as f:
-        json.dump(data[0], f, indent=4)
+        json.dump(data, f, indent=4)
 
 
 if __name__ == '__main__':
