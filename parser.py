@@ -1,4 +1,5 @@
 from xml.etree import ElementTree
+import json
 
 
 class Parser:
@@ -9,7 +10,39 @@ class Parser:
         self.parse(xml_path)
 
     def get_data(self):
-        pass
+        data = []
+        for event_mention in self.event_mentions:
+            item = dict()
+            item['sentence'] = event_mention['text']
+
+            entity_map = dict()
+            item['golden_entity_mentions'] = []
+            text_position = event_mention['position']
+            for entity_mention in self.entity_mentions:
+                entity_position = entity_mention['position']
+                if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
+                    item['golden_entity_mentions'].append({
+                        'text': entity_mention['text'],
+                        'entity_type': entity_mention['entity_type']
+                    })
+                    entity_map[entity_mention['entity_id']] = entity_mention
+
+            event_arguments = []
+            for argument in event_mention['arguments']:
+                event_arguments.append({
+                    'role': argument['role'],
+                    'entity_type': entity_map[argument['entity_id']]['entity_type'],
+                    'text': argument['text'],
+                })
+
+            item['golden_event_mention'] = {
+                'trigger': event_mention['trigger'],
+                'arguments': event_arguments,
+                'event_type': event_mention['event_type'],
+            }
+
+            data.append(item)
+        return data
 
     def parse(self, xml_path):
         tree = ElementTree.parse(xml_path)
@@ -94,3 +127,9 @@ class Parser:
             entity_mentions.append(entity_mention)
 
         return entity_mentions
+
+
+if __name__ == '__main__':
+    data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
+    with open('output/sample.json', 'w') as f:
+        json.dump(data[0], f, indent=4)
