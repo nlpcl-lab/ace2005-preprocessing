@@ -26,8 +26,25 @@ def get_data_paths(ace2005_path):
 
 def preprocessing(data_type, files):
     data = []
+
+    event_count, entity_count, sentence_count = 0, 0, 0
+
     for file in files:
-        data.extend(Parser(xml_path=file).get_data())
+        parser = Parser(xml_path=file)
+        data.extend(parser.get_data())
+
+        entity_count += len(parser.entity_mentions)
+        event_count += len(parser.event_mentions)
+        sentences = set()
+        for item in data:
+            sentences.add(item['sentence'])
+
+    sentence_count += len(sentences)
+    print('[result] type: ', data_type)
+    print('sentence_count :', sentence_count)
+    print('event_count :', event_count)
+    print('entity_count :', entity_count)
+
     with open('output/{}.json'.format(data_type), 'w') as f:
         json.dump(data, f, indent=2)
 

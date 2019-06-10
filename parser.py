@@ -52,7 +52,7 @@ class Parser:
             if child.tag == 'entity':
                 self.entity_mentions.extend(self.parse_entity_tag(child))
             elif child.tag in ['value', 'timex2']:
-                self.entity_mentions.extend(self.parse_value_timex(child))
+                self.entity_mentions.extend(self.parse_value_timex_tag(child))
             elif child.tag == 'event':
                 self.event_mentions.extend(self.parse_event_tag(child))
 
@@ -104,7 +104,7 @@ class Parser:
         return event_mentions
 
     @staticmethod
-    def parse_value_timex(node):
+    def parse_value_timex_tag(node):
         entity_mentions = []
 
         for child in node:

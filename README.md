@@ -2,22 +2,32 @@
 
 This is a simple code for preprocessing ACE 2005 corpus for Event Extraction task.
 
-
-
-## Usage
-
+## Prerequisites
 
 1. Prepare **ACE 2005 dataset** 
 
    (Download: https://catalog.ldc.upenn.edu/LDC2006T06. Note that ACE 2005 dataset is not free.)
 
-2. Run:
-
-    ```bash
-    python main.py --data=./data/ace_2005_td_v7/data/English
-    ``` 
-    Then you can get the parsed data in `output directory`. 
+2. Install the stanfordcorenlp package.
+   ```
+   pip install stanfordcorenlp
+   ```
     
+3. Download stanfordcorenlp model.
+    ```bash
+    wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+    unzip stanford-corenlp-full-2018-10-05.zip
+    ```
+
+## Usage
+
+Run:
+
+```bash
+python main.py --data=./data/ace_2005_td_v7/data/English
+``` 
+Then you can get the parsed data in `output directory`. 
+
 ## Output
 
 ### Format
