@@ -1,60 +1,112 @@
 from xml.etree import ElementTree
+from bs4 import BeautifulSoup
+import nltk
 import json
 
 
 class Parser:
-    def __init__(self, xml_path):
+    def __init__(self, path):
         self.entity_mentions = []
         self.event_mentions = []
+        self.sentences = []
 
-        self.parse(xml_path)
+        self.entity_mentions, self.event_mentions = self.parse_xml(path + '.apf.xml')
+        self.sents_with_pos = self.parse_sgm(path + '.sgm')
 
     def get_data(self):
         data = []
-        for event_mention in self.event_mentions:
+
+        def clean_text(text):
+            return text.replace('\n', ' ').strip()
+
+        for sent in self.sents_with_pos:
             item = dict()
-            item['sentence'] = event_mention['text']
+            item['sentence'] = clean_text(sent['text'])
+            text_position = sent['position']
 
             entity_map = dict()
             item['golden_entity_mentions'] = []
-            text_position = event_mention['position']
+            item['golden_event_mentions'] = []
+
             for entity_mention in self.entity_mentions:
                 entity_position = entity_mention['position']
                 if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
                     item['golden_entity_mentions'].append({
-                        'text': entity_mention['text'],
+                        'text': clean_text(entity_mention['text']),
                         'entity_type': entity_mention['entity_type']
                     })
                     entity_map[entity_mention['entity_id']] = entity_mention
 
-            event_arguments = []
-            for argument in event_mention['arguments']:
-                event_arguments.append({
-                    'role': argument['role'],
-                    'entity_type': entity_map[argument['entity_id']]['entity_type'],
-                    'text': argument['text'],
-                })
+            for event_mention in self.event_mentions:
+                event_position = event_mention['position']
+                if text_position[0] <= event_position[0] and event_position[1] <= text_position[1]:
+                    event_arguments = []
+                    for argument in event_mention['arguments']:
+                        event_arguments.append({
+                            'role': argument['role'],
+                            'entity_type': entity_map[argument['entity_id']]['entity_type'],
+                            'text': clean_text(argument['text']),
+                        })
 
-            item['golden_event_mention'] = {
-                'trigger': event_mention['trigger'],
-                'arguments': event_arguments,
-                'event_type': event_mention['event_type'],
-            }
+                    item['golden_event_mentions'].append({
+                        'trigger': clean_text(event_mention['trigger']),
+                        'arguments': event_arguments,
+                        'event_type': event_mention['event_type'],
+                    })
 
             data.append(item)
         return data
 
-    def parse(self, xml_path):
+    @staticmethod
+    def parse_sgm(sgm_path):
+        with open(sgm_path, 'r') as f:
+            soup = BeautifulSoup(f.read(), features='html.parser')
+            sgm_text = soup.text
+
+            doc_type = soup.doc.doctype.text.strip()
+
+            def remove_tags(selector):
+                tags = soup.findAll(selector)
+                for tag in tags:
+                    tag.extract()
+
+            if doc_type == 'WEB TEXT':
+                remove_tags('poster')
+                remove_tags('postdate')
+            elif doc_type in ['CONVERSATION', 'STORY']:
+                remove_tags('speaker')
+
+            sents = []
+            for sent in nltk.sent_tokenize(soup.text):
+                sents.extend(sent.split('\n\n'))
+            sents = list(filter(lambda x: len(x) > 5, sents))
+            sents = sents[1:]
+            sents_with_pos = []
+            last_pos = 0
+            for sent in sents:
+                pos = sgm_text.find(sent, last_pos)
+                last_pos = pos
+                sents_with_pos.append({
+                    'text': sent,
+                    'position': (pos, pos + len(sent))
+                })
+
+            return sents_with_pos
+
+    def parse_xml(self, xml_path):
+        entity_mentions, event_mentions = [], []
         tree = ElementTree.parse(xml_path)
         root = tree.getroot()
 
         for child in root[0]:
             if child.tag == 'entity':
-                self.entity_mentions.extend(self.parse_entity_tag(child))
+                entity_mentions.extend(self.parse_entity_tag(child))
             elif child.tag in ['value', 'timex2']:
-                self.entity_mentions.extend(self.parse_value_timex_tag(child))
+                entity_mentions.extend(self.parse_value_timex_tag(child))
             elif child.tag == 'event':
-                self.event_mentions.extend(self.parse_event_tag(child))
+                event_mentions.extend(self.parse_event_tag(child))
+
+        return entity_mentions, event_mentions
 
     @staticmethod
     def parse_entity_tag(node):
@@ -130,6 +182,14 @@ class Parser:
 
 
 if __name__ == '__main__':
-    data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
-    with open('output/sample.json', 'w') as f:
-        json.dump(data[0], f, indent=4)
+    # data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
+    # with open('output/sample.json', 'w') as f:
+    #     json.dump(data[0], f, indent=2)
+
+    with open('./data/ace_2005_td_v7/data/English/cts/timex2norm/fsh_29097.sgm', 'r') as f:
+        data = f.read()
+
+        # print(data[data.find('The Davao Medical Center') - 493:])
+
+        soup = BeautifulSoup(data, features='html.parser')
+        print(soup.text[537:548 + 1])

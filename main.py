@@ -14,7 +14,7 @@ def get_data_paths(ace2005_path):
             data_type = items[0]
             name = items[1]
 
-            path = os.path.join(ace2005_path, name + '.apf.xml')
+            path = os.path.join(ace2005_path, name)
             if data_type == 'test':
                 test_files.append(path)
             elif data_type == 'dev':
@@ -27,21 +27,18 @@ def get_data_paths(ace2005_path):
 def preprocessing(data_type, files):
     data = []
 
-    event_count, entity_count, sentence_count = 0, 0, 0
+    event_count, entity_count, sent_count = 0, 0, 0
 
     for file in files:
-        parser = Parser(xml_path=file)
+        parser = Parser(path=file)
         data.extend(parser.get_data())
 
         entity_count += len(parser.entity_mentions)
         event_count += len(parser.event_mentions)
-        sentences = set()
-        for item in data:
-            sentences.add(item['sentence'])
+        sent_count += len(parser.sents_with_pos)
 
-    sentence_count += len(sentences)
     print('[result] type: ', data_type)
-    print('sentence_count :', sentence_count)
+    print('sent_count :', sent_count)
     print('event_count :', event_count)
     print('entity_count :', entity_count)
 
@@ -57,3 +54,10 @@ if __name__ == '__main__':
     preprocessing('test', test_files)
     preprocessing('train', train_files)
     preprocessing('dev', dev_files)
+
+    # from stanfordcorenlp import StanfordCoreNLP
+    #
+    # nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05')
+    # print('loaded!')
+    # print(nlp.annotate('Thousands of fresh US troops headed for Iraq Thursday as British Prime Minister Tony Blair and US President George W. Bush discussed the effort to oust Saddam Hussein, which some senior US military officials warn could last months.', properties={'annotators': 'ssplit'}))
+    # nlp.close()

@@ -10,7 +10,7 @@ This is a simple code for preprocessing ACE 2005 corpus for Event Extraction tas
 
 2. Install the stanfordcorenlp package.
    ```
-   pip install stanfordcorenlp
+   pip install stanfordcorenlp beautifulsoup4 nltk
    ```
     
 3. Download stanfordcorenlp model.
@@ -34,8 +34,6 @@ Then you can get the parsed data in `output directory`.
 
 The results are generated in json format, like the bellow sample.
 
-Note that if there were multiple events in a sentence, they were divided into multiple instances per event.
-
 If you want to know event types and arguments in detail, read [this document (ACE 2005 event guidelines)](https://www.ldc.upenn.edu/sites/www.ldc.upenn.edu/files/english-events-guidelines-v5.4.3.pdf).
 
 
@@ -57,7 +55,7 @@ If you want to know event types and arguments in detail, read [this document (AC
         "entity_type": "PER:Group"
       }
     ],
-    "golden_event_mention": {
+    "golden_event_mentions": [{
       "trigger": "visited",
       "arguments": [
         {
@@ -72,7 +70,7 @@ If you want to know event types and arguments in detail, read [this document (AC
         }
       ],
       "event_type": "Contact:Meet"
-    }
+    }]
 }]
 ```
 
