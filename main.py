@@ -123,7 +123,7 @@ if __name__ == '__main__':
     test_files, dev_files, train_files = get_data_paths(args.data)
 
     nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05')
+    preprocessing('dev', dev_files)
     preprocessing('test', test_files)
-    # preprocessing('train', train_files)
-    # preprocessing('dev', dev_files)
+    preprocessing('train', train_files)
     nlp.close()

@@ -26,7 +26,7 @@ Using the existing code were complicated for me, so I made this project.
 Run:
 
 ```bash
-python main.py --data=./data/ace_2005_td_v7/data/English
+sudo python main.py --data=./data/ace_2005_td_v7/data/English
 ``` 
 Then you can get the parsed data in `output directory`. 
 
@@ -41,39 +41,60 @@ If you want to know event types and arguments in detail, read [this document (AC
 
 **`sample.json`**
 ```json
-[{
-    "sentence": "He visited all their families",
+[
+  {
+    "sentence": "He visited all their families.",
+    "tokens": ["He", "visited", "all", "their", "families", "."],
+    "pos-tag": ["PRP", "VBD", "PDT", "PRP$", "NNS", "."],
     "golden_entity_mentions": [
       {
-        "text": "He",
-        "entity_type": "PER:Individual"
+        "text": "He", 
+        "entity_type": "PER:Individual",
+        "start": 0,
+        "end": 0
       },
       {
         "text": "their",
-        "entity_type": "PER:Group"
+        "entity_type": "PER:Group",
+        "start": 3,
+        "end": 3
       },
       {
         "text": "all their families",
-        "entity_type": "PER:Group"
+        "entity_type": "PER:Group",
+        "start": 2,
+        "end": 5
       }
     ],
-    "golden_event_mentions": [{
-      "trigger": "visited",
-      "arguments": [
-        {
-          "role": "Entity",
-          "entity_type": "PER:Individual",
-          "text": "He"
+    "golden_event_mentions": [
+      {
+        "trigger": {
+          "text": "visited",
+          "start": 1,
+          "end": 1
         },
-        {
-          "role": "Entity",
-          "entity_type": "PER:Group",
-          "text": "all their families"
-        }
-      ],
-      "event_type": "Contact:Meet"
-    }]
-}]
+        "arguments": [
+          {
+            "role": "Entity",
+            "entity_type": "PER:Individual",
+            "text": "He",
+            "start": 0,
+            "end": 0
+          },
+          {
+            "role": "Entity",
+            "entity_type": "PER:Group",
+            "text": "all their families",
+            "start": 2,
+            "end": 5
+          }
+        ],
+        "event_type": "Contact:Meet"
+      }
+    ],
+    "parse": "(ROOT\n  (S\n    (NP (PRP He))\n    (VP (VBD visited)\n      (NP (PDT all) (PRP$ their) (NNS families)))\n    (. .)))"
+  }
+]
 ```
 
 
