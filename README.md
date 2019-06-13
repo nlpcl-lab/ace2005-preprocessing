@@ -10,9 +10,9 @@ Using the existing code were complicated for me, so I made this project.
 
    (Download: https://catalog.ldc.upenn.edu/LDC2006T06. Note that ACE 2005 dataset is not free.)
 
-2. Install the stanfordcorenlp package.
+2. Install the packages.
    ```
-   pip install stanfordcorenlp beautifulsoup4 nltk
+   pip install stanfordcorenlp beautifulsoup4 nltk tqdm
    ```
     
 3. Download stanford-corenlp model.

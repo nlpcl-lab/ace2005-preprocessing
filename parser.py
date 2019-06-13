@@ -21,15 +21,17 @@ class Parser:
 
         for sent in self.sents_with_pos:
             item = dict()
-            item['sentence'] = clean_text(sent['text'])
 
+            item['sentence'] = clean_text(sent['text'])
             item['position'] = sent['position']
             text_position = sent['position']
 
-            for i, s in enumerate(sent['position']):
+            for i, s in enumerate(item['sentence']):
                 if s != ' ':
                     item['position'][0] += i
                     break
+
+            item['sentence'] = item['sentence'].strip()
 
             entity_map = dict()
             item['golden_entity_mentions'] = []
@@ -58,7 +60,7 @@ class Parser:
                         })
 
                     item['golden_event_mentions'].append({
-                        'trigger': clean_text(event_mention['trigger']),
+                        'trigger': event_mention['trigger'],
                         'arguments': event_arguments,
                         'position': event_position,
                         'event_type': event_mention['event_type'],
@@ -98,7 +100,7 @@ class Parser:
                 last_pos = pos
                 sents_with_pos.append({
                     'text': sent,
-                    'position': (pos, pos + len(sent))
+                    'position': [pos, pos + len(sent)]
                 })
 
             return sents_with_pos
@@ -132,7 +134,7 @@ class Parser:
             entity_mention['entity_id'] = child.attrib['ID']
             entity_mention['entity_type'] = '{}:{}'.format(node.attrib['TYPE'], node.attrib['SUBTYPE'])
             entity_mention['text'] = charset.text
-            entity_mention['position'] = (int(charset.attrib['START']), int(charset.attrib['END']))
+            entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
 
             entity_mentions.append(entity_mention)
 
@@ -150,16 +152,19 @@ class Parser:
                     if child2.tag == 'ldc_scope':
                         charset = child2[0]
                         event_mention['text'] = charset.text
-                        event_mention['position'] = (int(charset.attrib['START']), int(charset.attrib['END']))
+                        event_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
                     if child2.tag == 'anchor':
                         charset = child2[0]
-                        event_mention['trigger'] = charset.text
+                        event_mention['trigger'] = {
+                            'text': charset.text,
+                            'position': [int(charset.attrib['START']), int(charset.attrib['END'])],
+                        }
                     if child2.tag == 'event_mention_argument':
                         extent = child2[0]
                         charset = extent[0]
                         event_mention['arguments'].append({
                             'text': charset.text,
-                            'position': (int(charset.attrib['START']), int(charset.attrib['END'])),
+                            'position': [int(charset.attrib['START']), int(charset.attrib['END'])],
                             'role': child2.attrib['ROLE'],
                             'entity_id': child2.attrib['REFID']
                         })
@@ -185,7 +190,7 @@ class Parser:
                 entity_mention['entity_type'] = 'TIM:time'
 
             entity_mention['text'] = charset.text
-            entity_mention['position'] = (int(charset.attrib['START']), int(charset.attrib['END']))
+            entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
 
             entity_mentions.append(entity_mention)
 
