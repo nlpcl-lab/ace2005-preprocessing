@@ -2,7 +2,7 @@
 
 This is a simple code for preprocessing ACE 2005 corpus for Event Extraction task. 
 
-The existing preprocessing program were complicated for me to use, so I made this project.
+The existing code were complicated for me to use, so I made this project.
 
 ## Prerequisites
 
