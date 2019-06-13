@@ -14,7 +14,7 @@
         "entity_type": "PER:Group"
       }
     ],
-    "golden_event_mention": {
+    "golden_event_mentions": [{
       "trigger": "visited",
       "arguments": [
         {
@@ -29,5 +29,5 @@
         }
       ],
       "event_type": "Contact:Meet"
-    }
+    }]
 }]

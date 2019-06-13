@@ -182,14 +182,7 @@ class Parser:
 
 
 if __name__ == '__main__':
-    # data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
-    # with open('output/sample.json', 'w') as f:
-    #     json.dump(data[0], f, indent=2)
+    data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
+    with open('output/sample.json', 'w') as f:
+        json.dump(data[0], f, indent=2)
 
-    with open('./data/ace_2005_td_v7/data/English/cts/timex2norm/fsh_29097.sgm', 'r') as f:
-        data = f.read()
-
-        # print(data[data.find('The Davao Medical Center') - 493:])
-
-        soup = BeautifulSoup(data, features='html.parser')
-        print(soup.text[537:548 + 1])
