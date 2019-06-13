@@ -34,7 +34,7 @@ def find_token_index(tokens, start_pos, end_pos):
         if token['characterOffsetEnd'] == end_pos:
             end_idx = idx
 
-    # Some of the ACE2005 data has annotation position error.
+    # Some of the ACE2005 data has annotation position errors.
     if end_idx == -1:
         end_idx = start_idx
 
@@ -59,13 +59,13 @@ def preprocessing(data_type, files):
             data['sentence'] = item['sentence']
             data['golden_entity_mentions'] = []
             data['golden_event_mentions'] = []
-            data['position'] = item['position']
 
             nlp_res = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,parse'})
             nlp_res = json.loads(nlp_res)
 
             tokens = nlp_res['sentences'][0]['tokens']
             # data['nlp_tokens'] = tokens
+            # data['position'] = item['position']
 
             data['tokens'] = list(map(lambda x: x['word'], tokens))
             data['pos-tag'] = list(map(lambda x: x['pos'], tokens))
@@ -93,6 +93,17 @@ def preprocessing(data_type, files):
                 del event_mention['trigger']['position']
                 del event_mention['position']
 
+                arguments = []
+                for argument in event_mention['arguments']:
+                    position = argument['position']
+                    start_idx, end_idx = find_token_index(tokens, position[0] - sent_start_pos, position[1] - sent_start_pos + 1)
+                    argument['start'] = start_idx
+                    argument['end'] = end_idx
+                    del argument['position']
+
+                    arguments.append(argument)
+
+                event_mention['arguments'] = arguments
                 data['golden_event_mentions'].append(event_mention)
 
             result.append(data)
