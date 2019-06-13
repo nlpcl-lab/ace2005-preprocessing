@@ -2,7 +2,7 @@
 
 This is a simple code for preprocessing ACE 2005 corpus for Event Extraction task. 
 
-The existing code were complicated for me to use, so I made this project.
+Using the existing code were complicated for me, so I made this project.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ The existing code were complicated for me to use, so I made this project.
    pip install stanfordcorenlp beautifulsoup4 nltk
    ```
     
-3. Download stanfordcorenlp model.
+3. Download stanford-corenlp model.
     ```bash
     wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
     unzip stanford-corenlp-full-2018-10-05.zip

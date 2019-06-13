@@ -17,12 +17,19 @@ class Parser:
         data = []
 
         def clean_text(text):
-            return text.replace('\n', ' ').strip()
+            return text.replace('\n', ' ')
 
         for sent in self.sents_with_pos:
             item = dict()
             item['sentence'] = clean_text(sent['text'])
+
+            item['position'] = sent['position']
             text_position = sent['position']
+
+            for i, s in enumerate(sent['position']):
+                if s != ' ':
+                    item['position'][0] += i
+                    break
 
             entity_map = dict()
             item['golden_entity_mentions'] = []
@@ -33,6 +40,7 @@ class Parser:
                 if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
                     item['golden_entity_mentions'].append({
                         'text': clean_text(entity_mention['text']),
+                        'position': entity_position,
                         'entity_type': entity_mention['entity_type']
                     })
                     entity_map[entity_mention['entity_id']] = entity_mention
@@ -44,6 +52,7 @@ class Parser:
                     for argument in event_mention['arguments']:
                         event_arguments.append({
                             'role': argument['role'],
+                            'position': argument['position'],
                             'entity_type': entity_map[argument['entity_id']]['entity_type'],
                             'text': clean_text(argument['text']),
                         })
@@ -51,6 +60,7 @@ class Parser:
                     item['golden_event_mentions'].append({
                         'trigger': clean_text(event_mention['trigger']),
                         'arguments': event_arguments,
+                        'position': event_position,
                         'event_type': event_mention['event_type'],
                     })
 
@@ -149,6 +159,7 @@ class Parser:
                         charset = extent[0]
                         event_mention['arguments'].append({
                             'text': charset.text,
+                            'position': (int(charset.attrib['START']), int(charset.attrib['END'])),
                             'role': child2.attrib['ROLE'],
                             'entity_id': child2.attrib['REFID']
                         })
@@ -185,4 +196,3 @@ if __name__ == '__main__':
     data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
     with open('output/sample.json', 'w') as f:
         json.dump(data[0], f, indent=2)
-

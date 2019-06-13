@@ -24,6 +24,7 @@ def get_data_paths(ace2005_path):
     return test_files, dev_files, train_files
 
 
+
 def preprocessing(data_type, files):
     data = []
 
@@ -37,6 +38,7 @@ def preprocessing(data_type, files):
         event_count += len(parser.event_mentions)
         sent_count += len(parser.sents_with_pos)
 
+    print('-' * 20)
     print('[result] type: ', data_type)
     print('sent_count :', sent_count)
     print('event_count :', event_count)
@@ -52,12 +54,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
     preprocessing('test', test_files)
-    preprocessing('train', train_files)
-    preprocessing('dev', dev_files)
+    # preprocessing('train', train_files)
+    # preprocessing('dev', dev_files)
 
     # from stanfordcorenlp import StanfordCoreNLP
     #
     # nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05')
     # print('loaded!')
-    # print(nlp.annotate('Thousands of fresh US troops headed for Iraq Thursday as British Prime Minister Tony Blair and US President George W. Bush discussed the effort to oust Saddam Hussein, which some senior US military officials warn could last months.', properties={'annotators': 'ssplit'}))
+    # print(nlp.annotate('   Thousands of fresh US troops headed for Iraq Thursday.', properties={'annotators': 'ssplit'}))
     # nlp.close()
