@@ -86,13 +86,16 @@ The resulting data is divided into test/dev/train as follows.
 │...
 ```
 
-This project use the same data split as the previous work (Liu et al., 2016b; Nguyen et al., 2016). The data segmentation is specified in `data_list.csv`.
+This project use the same data partitioning as the previous work ([Yang and Mitchell, 2016](https://www.cs.cmu.edu/~bishan/papers/joint_event_naacl16.pdf);  [Nguyen et al., 2016](https://www.aclweb.org/anthology/N16-1034)). The data segmentation is specified in `data_list.csv`.
 
-Below is information about the amount of data.
+Below is information about the amount of parsed data when using this project. It is slightly different from the parsing results of the two papers above. The difference appears to have occurred because there are no promised rules for parsing sentences in the sgm format file.
 
-|       	| Documents 	| Event Mentions 	| Entity Mensions 	|
-|-------	|-----------	|----------------	|-----------------	|
-| Test  	| 40        	| 424            	| 4226            	|
-| Dev   	| 30        	| 505            	| 4050            	|
-| Train 	| 529       	| 4420           	| 53045           	|
+
+|       	 Documents 	|  Sentences 	|Event Mentions 	| Entity Mentions 	|
+|-------	|-----------|-----------	|----------------	|-----------------	|
+| Test  	| 40        | 713           | 424            	| 4226            	|
+| Dev   	| 30        | 891           | 505            	| 4050            	|
+| Train 	| 529       | 14966         | 4420           	| 53045           	|
+
+
 
