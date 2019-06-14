@@ -28,9 +28,12 @@ Run:
 ```bash
 sudo python main.py --data=./data/ace_2005_td_v7/data/English
 ``` 
-Then you can get the parsed data in `output directory`. 
 
-Note that if it is not executed with the `sudo`, an error can occur when using `stanford-corenlp`.
+- Then you can get the parsed data in `output directory`. 
+
+- If it is not executed with the `sudo`, an error can occur when using `stanford-corenlp`.
+
+- It takes about 30 minutes to complete the pre-processing.
 
 ## Output
 
@@ -45,8 +48,8 @@ If you want to know event types and arguments in detail, read [this document (AC
 ```json
 [
   {
-    "sentence": "He visited all their families.",
-    "tokens": ["He", "visited", "all", "their", "families", "."],
+    "sentence": "He visited all his friends.",
+    "tokens": ["He", "visited", "all", "his", "friends", "."],
     "pos-tag": ["PRP", "VBD", "PDT", "PRP$", "NNS", "."],
     "golden_entity_mentions": [
       {
@@ -56,13 +59,13 @@ If you want to know event types and arguments in detail, read [this document (AC
         "end": 0
       },
       {
-        "text": "their",
+        "text": "his",
         "entity_type": "PER:Group",
         "start": 3,
         "end": 3
       },
       {
-        "text": "all their families",
+        "text": "all his friends",
         "entity_type": "PER:Group",
         "start": 2,
         "end": 5
@@ -86,7 +89,7 @@ If you want to know event types and arguments in detail, read [this document (AC
           {
             "role": "Entity",
             "entity_type": "PER:Group",
-            "text": "all their families",
+            "text": "all his friends",
             "start": 2,
             "end": 5
           }
@@ -94,7 +97,7 @@ If you want to know event types and arguments in detail, read [this document (AC
         "event_type": "Contact:Meet"
       }
     ],
-    "parse": "(ROOT\n  (S\n    (NP (PRP He))\n    (VP (VBD visited)\n      (NP (PDT all) (PRP$ their) (NNS families)))\n    (. .)))"
+    "parse": "(ROOT\n  (S\n    (NP (PRP He))\n    (VP (VBD visited)\n      (NP (PDT all) (PRP$ his) (NNS friends)))\n    (. .)))"
   }
 ]
 ```
@@ -121,6 +124,4 @@ Below is information about the amount of parsed data when using this project. It
 | Test  	| 40        | 713           | 424            	| 4226            	|
 | Dev   	| 30        | 891           | 505            	| 4050            	|
 | Train 	| 529       | 14966         | 4420           	| 53045           	|
-
-
 
