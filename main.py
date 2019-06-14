@@ -60,8 +60,14 @@ def preprocessing(data_type, files):
             data['golden_entity_mentions'] = []
             data['golden_event_mentions'] = []
 
-            nlp_res = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,parse'})
-            nlp_res = json.loads(nlp_res)
+            try:
+                nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,parse'})
+                nlp_res = json.loads(nlp_text)
+            except Exception as e:
+                print('Exception ', e)
+                print('item["sentence"] :', item['sentence'])
+                print('nlp_text :', nlp_text)
+                continue
 
             tokens = nlp_res['sentences'][0]['tokens']
             # data['nlp_tokens'] = tokens
@@ -122,8 +128,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
 
-    nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05')
+    nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', timeout=60000)
+    preprocessing('train', train_files)
     preprocessing('dev', dev_files)
     preprocessing('test', test_files)
-    preprocessing('train', train_files)
     nlp.close()

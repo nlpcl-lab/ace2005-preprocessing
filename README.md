@@ -2,7 +2,7 @@
 
 This is a simple code for preprocessing ACE 2005 corpus for Event Extraction task. 
 
-Using the existing code were complicated for me, so I made this project.
+Using the existing methods were complicated for me, so I made this project.
 
 ## Prerequisites
 
@@ -29,6 +29,8 @@ Run:
 sudo python main.py --data=./data/ace_2005_td_v7/data/English
 ``` 
 Then you can get the parsed data in `output directory`. 
+
+Note that if it is not executed with the `sudo`, an error can occur when using `stanford-corenlp`.
 
 ## Output
 
