@@ -26,7 +26,7 @@ def get_data_paths(ace2005_path):
     return test_files, dev_files, train_files
 
 
-def find_token_index(tokens, start_pos, end_pos):
+def find_token_index(tokens, start_pos, end_pos, phrase):
     start_idx, end_idx = -1, -1
     for idx, token in enumerate(tokens):
         if token['characterOffsetBegin'] <= start_pos:
@@ -36,7 +36,7 @@ def find_token_index(tokens, start_pos, end_pos):
 
     # Some of the ACE2005 data has annotation position errors.
     if end_idx == -1:
-        end_idx = start_idx
+        end_idx = start_idx + len(phrase.split(' ')) - 1
 
     return start_idx, end_idx
 
@@ -81,7 +81,12 @@ def preprocessing(data_type, files):
 
             for entity_mention in item['golden_entity_mentions']:
                 position = entity_mention['position']
-                start_idx, end_idx = find_token_index(tokens, position[0] - sent_start_pos, position[1] - sent_start_pos + 1)
+                start_idx, end_idx = find_token_index(
+                    tokens=tokens,
+                    start_pos=position[0] - sent_start_pos,
+                    end_pos=position[1] - sent_start_pos + 1,
+                    phrase=entity_mention['text'],
+                )
 
                 entity_mention['start'] = start_idx
                 entity_mention['end'] = end_idx
@@ -92,7 +97,12 @@ def preprocessing(data_type, files):
 
             for event_mention in item['golden_event_mentions']:
                 position = event_mention['trigger']['position']
-                start_idx, end_idx = find_token_index(tokens, position[0] - sent_start_pos, position[1] - sent_start_pos + 1)
+                start_idx, end_idx = find_token_index(
+                    tokens=tokens,
+                    start_pos=position[0] - sent_start_pos,
+                    end_pos=position[1] - sent_start_pos + 1,
+                    phrase=event_mention['trigger']['text'],
+                )
 
                 event_mention['trigger']['start'] = start_idx
                 event_mention['trigger']['end'] = end_idx
@@ -102,7 +112,12 @@ def preprocessing(data_type, files):
                 arguments = []
                 for argument in event_mention['arguments']:
                     position = argument['position']
-                    start_idx, end_idx = find_token_index(tokens, position[0] - sent_start_pos, position[1] - sent_start_pos + 1)
+                    start_idx, end_idx = find_token_index(
+                        tokens=tokens,
+                        start_pos=position[0] - sent_start_pos,
+                        end_pos=position[1] - sent_start_pos + 1,
+                        phrase=argument['text'],
+                    )
                     argument['start'] = start_idx
                     argument['end'] = end_idx
                     del argument['position']
@@ -128,8 +143,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
 
-    nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', timeout=60000)
-    preprocessing('train', train_files)
+    nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=30000)
     preprocessing('dev', dev_files)
+    preprocessing('train', train_files)
     preprocessing('test', test_files)
     nlp.close()
