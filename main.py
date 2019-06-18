@@ -7,7 +7,6 @@ import argparse
 from tqdm import tqdm
 
 
-
 def get_data_paths(ace2005_path):
     test_files, dev_files, train_files = [], [], []
 
@@ -77,12 +76,11 @@ def preprocessing(data_type, files):
 
             if len(nlp_res['sentences']) >= 2:
                 print('len >=2! Sentence :', data['sentence'])
-                # print(nlp_res)
                 continue
 
             data['stanford-colcc'] = []
             for dep in nlp_res['sentences'][0]['enhancedPlusPlusDependencies']:
-                data['stanford-colcc'].append('{}/dep={}/gov={}'.format(dep['dep'], dep['dependent'], dep['governor']))
+                data['stanford-colcc'].append('{}/dep={}/gov={}'.format(dep['dep'], dep['dependent'] - 1, dep['governor'] - 1))
 
             data['words'] = list(map(lambda x: x['word'], tokens))
             data['pos-tags'] = list(map(lambda x: x['pos'], tokens))

@@ -98,12 +98,18 @@ class Parser:
             converted_text = converted_text.replace('p.m.', 'pm')
             converted_text = converted_text.replace('U.N.', 'UN')
             converted_text = converted_text.replace('U.S.', 'US')
+            converted_text = converted_text.replace(' ill. ', ' ill ')
             converted_text = converted_text.replace(' pa. ', ' pa ')
+
+            converted_text = converted_text.replace(".? ", "? ")
+            converted_text = converted_text.replace("?). ", "? ")
+
             converted_text = converted_text.replace('. his', '. His')
             converted_text = converted_text.replace(". i'm", ". I'm")
             converted_text = converted_text.replace(". the", ". The")
             converted_text = converted_text.replace(". all", ". All")
             converted_text = converted_text.replace(". during", ". During")
+            converted_text = converted_text.replace(". soon", ". Soon")
 
             converted_text = converted_text.replace("11. ", "11 ")
             converted_text = converted_text.replace("1985. ", "1985 ")
