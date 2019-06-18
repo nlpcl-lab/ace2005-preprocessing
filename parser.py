@@ -34,18 +34,18 @@ class Parser:
             item['sentence'] = item['sentence'].strip()
 
             entity_map = dict()
-            item['golden_entity_mentions'] = []
-            item['golden_event_mentions'] = []
+            item['golden-entity-mentions'] = []
+            item['golden-event-mentions'] = []
 
             for entity_mention in self.entity_mentions:
                 entity_position = entity_mention['position']
                 if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
-                    item['golden_entity_mentions'].append({
+                    item['golden-entity-mentions'].append({
                         'text': clean_text(entity_mention['text']),
                         'position': entity_position,
-                        'entity_type': entity_mention['entity_type']
+                        'entity-type': entity_mention['entity-type']
                     })
-                    entity_map[entity_mention['entity_id']] = entity_mention
+                    entity_map[entity_mention['entity-id']] = entity_mention
 
             for event_mention in self.event_mentions:
                 event_position = event_mention['position']
@@ -55,11 +55,11 @@ class Parser:
                         event_arguments.append({
                             'role': argument['role'],
                             'position': argument['position'],
-                            'entity_type': entity_map[argument['entity_id']]['entity_type'],
+                            'entity-type': entity_map[argument['entity-id']]['entity-type'],
                             'text': clean_text(argument['text']),
                         })
 
-                    item['golden_event_mentions'].append({
+                    item['golden-event-mentions'].append({
                         'trigger': event_mention['trigger'],
                         'arguments': event_arguments,
                         'position': event_position,
@@ -89,7 +89,13 @@ class Parser:
                 remove_tags('speaker')
 
             sents = []
-            for sent in nltk.sent_tokenize(soup.text):
+            converted_text = soup.text
+            converted_text = converted_text.split('Ltd.', 'Limited')
+            converted_text = converted_text.split('Co.', 'Company')
+            converted_text = converted_text.split('Corp.', 'Corporation')
+            converted_text = converted_text.split('Inc.', 'Incorporated')
+
+            for sent in nltk.sent_tokenize(converted_text):
                 sents.extend(sent.split('\n\n'))
             sents = list(filter(lambda x: len(x) > 5, sents))
             sents = sents[1:]
@@ -131,8 +137,8 @@ class Parser:
             charset = extent[0]
 
             entity_mention = dict()
-            entity_mention['entity_id'] = child.attrib['ID']
-            entity_mention['entity_type'] = '{}:{}'.format(node.attrib['TYPE'], node.attrib['SUBTYPE'])
+            entity_mention['entity-id'] = child.attrib['ID']
+            entity_mention['entity-type'] = '{}:{}'.format(node.attrib['TYPE'], node.attrib['SUBTYPE'])
             entity_mention['text'] = charset.text
             entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
 
@@ -166,7 +172,7 @@ class Parser:
                             'text': charset.text,
                             'position': [int(charset.attrib['START']), int(charset.attrib['END'])],
                             'role': child2.attrib['ROLE'],
-                            'entity_id': child2.attrib['REFID']
+                            'entity-id': child2.attrib['REFID']
                         })
                 event_mentions.append(event_mention)
         return event_mentions
@@ -180,14 +186,14 @@ class Parser:
             charset = extent[0]
 
             entity_mention = dict()
-            entity_mention['entity_id'] = child.attrib['ID']
+            entity_mention['entity-id'] = child.attrib['ID']
 
             if 'TYPE' in node.attrib:
-                entity_mention['entity_type'] = node.attrib['TYPE']
+                entity_mention['entity-type'] = node.attrib['TYPE']
             if 'SUBTYPE' in node.attrib:
-                entity_mention['entity_type'] += ':{}'.format(node.attrib['SUBTYPE'])
+                entity_mention['entity-type'] += ':{}'.format(node.attrib['SUBTYPE'])
             if child.tag == 'timex2_mention':
-                entity_mention['entity_type'] = 'TIM:time'
+                entity_mention['entity-type'] = 'TIM:time'
 
             entity_mention['text'] = charset.text
             entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]

@@ -31,12 +31,12 @@ def find_token_index(tokens, start_pos, end_pos, phrase):
     for idx, token in enumerate(tokens):
         if token['characterOffsetBegin'] <= start_pos:
             start_idx = idx
-        if token['characterOffsetEnd'] == end_pos:
-            end_idx = idx
+        # if token['characterOffsetEnd'] == end_pos:
+        #     end_idx = idx - 1
 
     # Some of the ACE2005 data has annotation position errors.
     if end_idx == -1:
-        end_idx = start_idx + len(phrase.split(' ')) - 1
+        end_idx = start_idx + len(phrase.split())
 
     return start_idx, end_idx
 
@@ -57,11 +57,11 @@ def preprocessing(data_type, files):
         for item in parser.get_data():
             data = dict()
             data['sentence'] = item['sentence']
-            data['golden_entity_mentions'] = []
-            data['golden_event_mentions'] = []
+            data['golden-entity-mentions'] = []
+            data['golden-event-mentions'] = []
 
             try:
-                nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,parse'})
+                nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
                 nlp_res = json.loads(nlp_text)
             except Exception as e:
                 print('Exception ', e)
@@ -73,13 +73,18 @@ def preprocessing(data_type, files):
             # data['nlp_tokens'] = tokens
             # data['position'] = item['position']
 
-            data['tokens'] = list(map(lambda x: x['word'], tokens))
-            data['pos-tag'] = list(map(lambda x: x['pos'], tokens))
+            data['stanford-colcc'] = []
+            for dep in nlp_res['sentences'][0]['enhancedPlusPlusDependencies']:
+                data['stanford-colcc'].append('{}/dep={}/gov={}'.format(dep['dep'], dep['dependent'], dep['governor']))
+
+            data['words'] = list(map(lambda x: x['word'], tokens))
+            data['pos-tags'] = list(map(lambda x: x['pos'], tokens))
+            data['lemma'] = list(map(lambda x: x['lemma'], tokens))
             data['parse'] = nlp_res['sentences'][0]['parse']
 
             sent_start_pos = item['position'][0]
 
-            for entity_mention in item['golden_entity_mentions']:
+            for entity_mention in item['golden-entity-mentions']:
                 position = entity_mention['position']
                 start_idx, end_idx = find_token_index(
                     tokens=tokens,
@@ -93,9 +98,9 @@ def preprocessing(data_type, files):
 
                 del entity_mention['position']
 
-                data['golden_entity_mentions'].append(entity_mention)
+                data['golden-entity-mentions'].append(entity_mention)
 
-            for event_mention in item['golden_event_mentions']:
+            for event_mention in item['golden-event-mentions']:
                 position = event_mention['trigger']['position']
                 start_idx, end_idx = find_token_index(
                     tokens=tokens,
@@ -125,7 +130,7 @@ def preprocessing(data_type, files):
                     arguments.append(argument)
 
                 event_mention['arguments'] = arguments
-                data['golden_event_mentions'].append(event_mention)
+                data['golden-event-mentions'].append(event_mention)
 
             result.append(data)
 
@@ -143,8 +148,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
 
-    nlp = StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=30000)
-    preprocessing('dev', dev_files)
-    preprocessing('train', train_files)
-    preprocessing('test', test_files)
-    nlp.close()
+    with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=30000) as nlp:
+        # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
+        # print(res)
+
+        preprocessing('dev', dev_files)
+        preprocessing('train', train_files)
+        preprocessing('test', test_files)

@@ -39,7 +39,7 @@ sudo python main.py --data=./data/ace_2005_td_v7/data/English
 
 ### Format
 
-The results are generated in json format, like the bellow sample.
+We follow the json format described in [EMNLP2018-JMEE](https://github.com/lx865712528/EMNLP2018-JMEE) repository like the bellow sample.
 
 If you want to know event types and arguments in detail, read [this document (ACE 2005 event guidelines)](https://www.ldc.upenn.edu/sites/www.ldc.upenn.edu/files/english-events-guidelines-v5.4.3.pdf).
 
