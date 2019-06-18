@@ -2,6 +2,7 @@ from xml.etree import ElementTree
 from bs4 import BeautifulSoup
 import nltk
 import json
+import re
 
 
 class Parser:
@@ -90,10 +91,23 @@ class Parser:
 
             sents = []
             converted_text = soup.text
-            converted_text = converted_text.split('Ltd.', 'Limited')
-            converted_text = converted_text.split('Co.', 'Company')
-            converted_text = converted_text.split('Corp.', 'Corporation')
-            converted_text = converted_text.split('Inc.', 'Incorporated')
+            converted_text = converted_text.replace('Ltd.', 'Limited')
+            converted_text = converted_text.replace('Co.', 'Company')
+            converted_text = converted_text.replace('Corp.', 'Corporation')
+            converted_text = converted_text.replace('Inc.', 'Incorporated')
+            converted_text = converted_text.replace('p.m.', 'pm')
+            converted_text = converted_text.replace('U.N.', 'UN')
+            converted_text = converted_text.replace('U.S.', 'US')
+            converted_text = converted_text.replace(' pa. ', ' pa ')
+            converted_text = converted_text.replace('. his', '. His')
+            converted_text = converted_text.replace(". i'm", ". I'm")
+            converted_text = converted_text.replace(". the", ". The")
+            converted_text = converted_text.replace(". all", ". All")
+            converted_text = converted_text.replace(". during", ". During")
+
+            converted_text = converted_text.replace("11. ", "11 ")
+            converted_text = converted_text.replace("1985. ", "1985 ")
+            converted_text = re.sub(r'(\d)\.\s', ' ', converted_text)
 
             for sent in nltk.sent_tokenize(converted_text):
                 sents.extend(sent.split('\n\n'))

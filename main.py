@@ -1,9 +1,11 @@
 import os
+import copy
 from parser import Parser
 import json
 from stanfordcorenlp import StanfordCoreNLP
 import argparse
 from tqdm import tqdm
+
 
 
 def get_data_paths(ace2005_path):
@@ -64,7 +66,7 @@ def preprocessing(data_type, files):
                 nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
                 nlp_res = json.loads(nlp_text)
             except Exception as e:
-                print('Exception ', e)
+                print('StanfordCore Exception ', e)
                 print('item["sentence"] :', item['sentence'])
                 print('nlp_text :', nlp_text)
                 continue
@@ -72,6 +74,11 @@ def preprocessing(data_type, files):
             tokens = nlp_res['sentences'][0]['tokens']
             # data['nlp_tokens'] = tokens
             # data['position'] = item['position']
+
+            if len(nlp_res['sentences']) >= 2:
+                print('len >=2! Sentence :', data['sentence'])
+                # print(nlp_res)
+                continue
 
             data['stanford-colcc'] = []
             for dep in nlp_res['sentences'][0]['enhancedPlusPlusDependencies']:
@@ -101,6 +108,8 @@ def preprocessing(data_type, files):
                 data['golden-entity-mentions'].append(entity_mention)
 
             for event_mention in item['golden-event-mentions']:
+                # same event mention cab be shared
+                event_mention = copy.deepcopy(event_mention)
                 position = event_mention['trigger']['position']
                 start_idx, end_idx = find_token_index(
                     tokens=tokens,
@@ -151,7 +160,6 @@ if __name__ == '__main__':
     with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=30000) as nlp:
         # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
         # print(res)
-
         preprocessing('dev', dev_files)
         preprocessing('train', train_files)
         preprocessing('test', test_files)
