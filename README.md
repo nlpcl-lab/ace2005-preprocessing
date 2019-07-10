@@ -51,27 +51,27 @@ If you want to know event types and arguments in detail, read [this document (AC
     "sentence": "He visited all his friends.",
     "tokens": ["He", "visited", "all", "his", "friends", "."],
     "pos-tag": ["PRP", "VBD", "PDT", "PRP$", "NNS", "."],
-    "golden_entity_mentions": [
+    "golden-entity-mentions": [
       {
         "text": "He", 
-        "entity_type": "PER:Individual",
+        "entity-type": "PER:Individual",
         "start": 0,
         "end": 0
       },
       {
         "text": "his",
-        "entity_type": "PER:Group",
+        "entity-type": "PER:Group",
         "start": 3,
         "end": 3
       },
       {
         "text": "all his friends",
-        "entity_type": "PER:Group",
+        "entity-type": "PER:Group",
         "start": 2,
         "end": 5
       }
     ],
-    "golden_event_mentions": [
+    "golden-event-mentions": [
       {
         "trigger": {
           "text": "visited",
@@ -81,14 +81,14 @@ If you want to know event types and arguments in detail, read [this document (AC
         "arguments": [
           {
             "role": "Entity",
-            "entity_type": "PER:Individual",
+            "entity-type": "PER:Individual",
             "text": "He",
             "start": 0,
             "end": 0
           },
           {
             "role": "Entity",
-            "entity_type": "PER:Group",
+            "entity-type": "PER:Group",
             "text": "all his friends",
             "start": 2,
             "end": 5
