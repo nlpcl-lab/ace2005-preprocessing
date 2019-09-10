@@ -121,5 +121,5 @@ Below is information about the amount of parsed data when using this project. It
 |          | Documents    |  Sentences   |Event Mentions    | Entity Mentions  |
 |-------   |-----------|-----------   |----------------  |----------------- |
 | Test     | 40        | 713           | 424              | 4226             |
-| Dev      | 30        | 891           | 505              | 4050             |
-| Train    | 529       | 14966         | 4420             | 53045            |
+| Dev      | 30        | 875           | 505              | 4050             |
+| Train    | 529       | 14724         | 4420             | 53045            |

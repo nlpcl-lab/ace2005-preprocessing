@@ -71,8 +71,6 @@ def preprocessing(data_type, files):
                 continue
 
             tokens = nlp_res['sentences'][0]['tokens']
-            # data['nlp_tokens'] = tokens
-            # data['position'] = item['position']
 
             if len(nlp_res['sentences']) >= 2:
                 print('len >=2! Sentence :', data['sentence'])
@@ -155,7 +153,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
 
-    with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=30000) as nlp:
+    with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=60000) as nlp:
         # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
         # print(res)
         preprocessing('dev', dev_files)
