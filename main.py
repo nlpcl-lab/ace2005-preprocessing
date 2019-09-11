@@ -28,25 +28,22 @@ def get_data_paths(ace2005_path):
 
 
 def find_token_index(tokens, start_pos, end_pos, phrase):
-    start_idx, end_idx = -1, -1
+    start_idx = -1
     for idx, token in enumerate(tokens):
         if token['characterOffsetBegin'] <= start_pos:
             start_idx = idx
-        # if token['characterOffsetEnd'] == end_pos:
-        #     end_idx = idx - 1
 
     # Some of the ACE2005 data has annotation position errors.
-    if end_idx == -1:
-        end_idx = start_idx + len(phrase.split())
+    end_idx = start_idx + len(phrase.split())
 
     return start_idx, end_idx
 
 
 def preprocessing(data_type, files):
     result = []
-    event_count, entity_count, sent_count = 0, 0, 0
+    event_count, entity_count, sent_count, argument_count = 0, 0, 0, 0
 
-    print('-' * 20)
+    print('=' * 20)
     print('[preprocessing] type: ', data_type)
     for file in tqdm(files):
         parser = Parser(path=file)
@@ -65,15 +62,14 @@ def preprocessing(data_type, files):
                 nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
                 nlp_res = json.loads(nlp_text)
             except Exception as e:
-                print('StanfordCore Exception ', e)
-                print('item["sentence"] :', item['sentence'])
-                print('nlp_text :', nlp_text)
+                print('[Warning] StanfordCore Exception: ', nlp_text, 'This sentence will be ignored.')
                 continue
 
             tokens = nlp_res['sentences'][0]['tokens']
 
             if len(nlp_res['sentences']) >= 2:
-                print('len >=2! Sentence :', data['sentence'])
+                # TODO: issue where the sentence segmentation of NTLK and StandfordCoreNLP do not match
+                # This error occurred so little that it was temporarily ignored (< 20 sentences).
                 continue
 
             data['stanford-colcc'] = []
@@ -104,7 +100,7 @@ def preprocessing(data_type, files):
                 data['golden-entity-mentions'].append(entity_mention)
 
             for event_mention in item['golden-event-mentions']:
-                # same event mention cab be shared
+                # same event mention can be shared
                 event_mention = copy.deepcopy(event_mention)
                 position = event_mention['trigger']['position']
                 start_idx, end_idx = find_token_index(
@@ -120,6 +116,7 @@ def preprocessing(data_type, files):
                 del event_mention['position']
 
                 arguments = []
+                argument_count += len(event_mention['arguments'])
                 for argument in event_mention['arguments']:
                     position = argument['position']
                     start_idx, end_idx = find_token_index(
@@ -139,9 +136,11 @@ def preprocessing(data_type, files):
 
             result.append(data)
 
-    print('sent_count :', sent_count)
-    print('event_count :', event_count)
-    print('entity_count :', entity_count)
+    print('======[Statistics]======')
+    print('sent :', sent_count)
+    print('event :', event_count)
+    print('entity :', entity_count)
+    print('argument:', argument_count)
 
     with open('output/{}.json'.format(data_type), 'w') as f:
         json.dump(result, f, indent=2)
@@ -156,6 +155,6 @@ if __name__ == '__main__':
     with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=60000) as nlp:
         # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
         # print(res)
-        preprocessing('dev', dev_files)
         preprocessing('train', train_files)
         preprocessing('test', test_files)
+        preprocessing('dev', dev_files)

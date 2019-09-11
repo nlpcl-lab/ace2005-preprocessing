@@ -7,6 +7,7 @@ import re
 
 class Parser:
     def __init__(self, path):
+        self.path = path
         self.entity_mentions = []
         self.event_mentions = []
         self.sentences = []
@@ -55,10 +56,16 @@ class Parser:
                 if text_position[0] <= event_position[0] and event_position[1] <= text_position[1]:
                     event_arguments = []
                     for argument in event_mention['arguments']:
+                        try:
+                            entity_type = entity_map[argument['entity-id']]['entity-type']
+                        except KeyError:
+                            print('[Warning] The entity in the other sentence is mentioned. This argument will be ignored.')
+                            continue
+
                         event_arguments.append({
                             'role': argument['role'],
                             'position': argument['position'],
-                            'entity-type': entity_map[argument['entity-id']]['entity-type'],
+                            'entity-type': entity_type,
                             'text': self.clean_text(argument['text']),
                         })
 
@@ -71,16 +78,15 @@ class Parser:
             data.append(item)
         return data
 
-    @staticmethod
-    def find_correct_offset(sgm_text, start_index, text):
+    def find_correct_offset(self, sgm_text, start_index, text):
         offset = 0
-        for i in range(0, 50):
+        for i in range(0, 70):
             for j in [-1, 1]:
                 offset = i * j
                 if sgm_text[start_index + offset:start_index + offset + len(text)] == text:
                     return offset
 
-        print('[Warning] fail to find offset! (start_index: {}, text: {})'.format(start_index, text))
+        print('[Warning] fail to find offset! (start_index: {}, text: {}, path: {})'.format(start_index, text, self.path))
         return offset
 
     def fix_wrong_position(self):
@@ -240,11 +246,12 @@ class Parser:
 
 
 if __name__ == '__main__':
-    parser = Parser('./data/ace_2005_td_v7/data/English/un/fp2/alt.gossip.celebrities_20041118.2331')
-    # parser = Parser('./data/ace_2005_td_v7/data/English/un/adj/alt.atheism_20041104.2428')
+    # parser = Parser('./data/ace_2005_td_v7/data/English/un/fp2/alt.gossip.celebrities_20041118.2331')
+    parser = Parser('./data/ace_2005_td_v7/data/English/un/timex2norm/alt.corel_20041228.0503')
     data = parser.get_data()
     with open('./output/debug.json', 'w') as f:
         json.dump(data, f, indent=2)
 
-    index = parser.sgm_text.find("the two")
-    # print(parser.sgm_text[index:])
+    # index = parser.sgm_text.find("Diego Garcia")
+    # print('index :', index)
+    # print(parser.sgm_text[1918 - 30:])
