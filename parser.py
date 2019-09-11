@@ -10,20 +10,22 @@ class Parser:
         self.entity_mentions = []
         self.event_mentions = []
         self.sentences = []
+        self.sgm_text = ''
 
         self.entity_mentions, self.event_mentions = self.parse_xml(path + '.apf.xml')
         self.sents_with_pos = self.parse_sgm(path + '.sgm')
+        self.fix_wrong_position()
+
+    @staticmethod
+    def clean_text(text):
+        return text.replace('\n', ' ')
 
     def get_data(self):
         data = []
-
-        def clean_text(text):
-            return text.replace('\n', ' ')
-
         for sent in self.sents_with_pos:
             item = dict()
 
-            item['sentence'] = clean_text(sent['text'])
+            item['sentence'] = self.clean_text(sent['text'])
             item['position'] = sent['position']
             text_position = sent['position']
 
@@ -42,7 +44,7 @@ class Parser:
                 entity_position = entity_mention['position']
                 if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
                     item['golden-entity-mentions'].append({
-                        'text': clean_text(entity_mention['text']),
+                        'text': self.clean_text(entity_mention['text']),
                         'position': entity_position,
                         'entity-type': entity_mention['entity-type']
                     })
@@ -57,7 +59,7 @@ class Parser:
                             'role': argument['role'],
                             'position': argument['position'],
                             'entity-type': entity_map[argument['entity-id']]['entity-type'],
-                            'text': clean_text(argument['text']),
+                            'text': self.clean_text(argument['text']),
                         })
 
                     item['golden-event-mentions'].append({
@@ -66,15 +68,51 @@ class Parser:
                         'position': event_position,
                         'event_type': event_mention['event_type'],
                     })
-
             data.append(item)
         return data
 
     @staticmethod
-    def parse_sgm(sgm_path):
+    def find_correct_offset(sgm_text, start_index, text):
+        offset = 0
+        for i in range(0, 50):
+            for j in [-1, 1]:
+                offset = i * j
+                if sgm_text[start_index + offset:start_index + offset + len(text)] == text:
+                    return offset
+
+        print('[Warning] fail to find offset! (start_index: {}, text: {})'.format(start_index, text))
+        return offset
+
+    def fix_wrong_position(self):
+        for entity_mention in self.entity_mentions:
+            offset = self.find_correct_offset(
+                sgm_text=self.sgm_text,
+                start_index=entity_mention['position'][0],
+                text=entity_mention['text'])
+
+            entity_mention['position'][0] += offset
+            entity_mention['position'][1] += offset
+
+        for event_mention in self.event_mentions:
+            offset1 = self.find_correct_offset(
+                sgm_text=self.sgm_text,
+                start_index=event_mention['trigger']['position'][0],
+                text=event_mention['trigger']['text'])
+            event_mention['trigger']['position'][0] += offset1
+            event_mention['trigger']['position'][1] += offset1
+
+            for argument in event_mention['arguments']:
+                offset2 = self.find_correct_offset(
+                    sgm_text=self.sgm_text,
+                    start_index=argument['position'][0],
+                    text=argument['text'])
+                argument['position'][0] += offset2
+                argument['position'][1] += offset2
+
+    def parse_sgm(self, sgm_path):
         with open(sgm_path, 'r') as f:
             soup = BeautifulSoup(f.read(), features='html.parser')
-            sgm_text = soup.text
+            self.sgm_text = soup.text
 
             doc_type = soup.doc.doctype.text.strip()
 
@@ -92,27 +130,6 @@ class Parser:
 
             sents = []
             converted_text = soup.text
-            # converted_text = converted_text.replace('Ltd.', 'Limited')
-            # converted_text = converted_text.replace('Co.', 'Company')
-            # converted_text = converted_text.replace('Corp.', 'Corporation')
-            # converted_text = converted_text.replace('Inc.', 'Incorporated')
-            # converted_text = converted_text.replace('p.m.', 'pm')
-            # converted_text = converted_text.replace('U.N.', 'UN')
-            # converted_text = converted_text.replace('U.S.', 'US')
-            # converted_text = converted_text.replace(' ill. ', ' ill ')
-            # converted_text = converted_text.replace(' pa. ', ' pa ')
-            #
-            # converted_text = converted_text.replace(".? ", "? ")
-            # converted_text = converted_text.replace("?). ", "? ")
-            #
-            # converted_text = converted_text.replace('. his', '. His')
-            # converted_text = converted_text.replace(". i'm", ". I'm")
-            # converted_text = converted_text.replace(". the", ". The")
-            # converted_text = converted_text.replace(". all", ". All")
-            # converted_text = converted_text.replace(". during", ". During")
-            # converted_text = converted_text.replace(". soon", ". Soon")
-            #
-            # converted_text = re.sub(r'(\d)\.\s', ' ', converted_text)
 
             for sent in nltk.sent_tokenize(converted_text):
                 sents.extend(sent.split('\n\n'))
@@ -121,7 +138,7 @@ class Parser:
             sents_with_pos = []
             last_pos = 0
             for sent in sents:
-                pos = sgm_text.find(sent, last_pos)
+                pos = self.sgm_text.find(sent, last_pos)
                 last_pos = pos
                 sents_with_pos.append({
                     'text': sent,
@@ -191,7 +208,7 @@ class Parser:
                             'text': charset.text,
                             'position': [int(charset.attrib['START']), int(charset.attrib['END'])],
                             'role': child2.attrib['ROLE'],
-                            'entity-id': child2.attrib['REFID']
+                            'entity-id': child2.attrib['REFID'],
                         })
                 event_mentions.append(event_mention)
         return event_mentions
@@ -223,6 +240,11 @@ class Parser:
 
 
 if __name__ == '__main__':
-    data = Parser('./data/ace_2005_td_v7/data/English/nw/timex2norm/AFP_ENG_20030304.0250.apf.xml').get_data()
-    with open('output/sample.json', 'w') as f:
-        json.dump(data[0], f, indent=2)
+    parser = Parser('./data/ace_2005_td_v7/data/English/un/fp2/alt.gossip.celebrities_20041118.2331')
+    # parser = Parser('./data/ace_2005_td_v7/data/English/un/adj/alt.atheism_20041104.2428')
+    data = parser.get_data()
+    with open('./output/debug.json', 'w') as f:
+        json.dump(data, f, indent=2)
+
+    index = parser.sgm_text.find("the two")
+    # print(parser.sgm_text[index:])

@@ -7,6 +7,9 @@ data/ace_2005_td_v7
 output/dev.json
 output/train.json
 output/dev.json
+output/debug.json
+
+test.json
 
 stanford-corenlp-full-2018-10-05.zip
 stanford-corenlp-full-2018-10-05/
