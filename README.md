@@ -119,7 +119,7 @@ This project use the same data partitioning as the previous work ([Yang and Mitc
 Below is information about the amount of parsed data when using this project. It is slightly different from the parsing results of the two papers above. The difference seems to have occurred because there are no promised rules for splitting sentences within the sgm format files.
 
 |          | Documents    |  Sentences   |Triggers    | Arguments | Entity Mentions  |
-|-------   |-----------|-----------   |---------------|----------------- |----------------- |
-| Test     | 40        | 713           | 424           | 878             |  4226             |
-| Dev      | 30        | 875           | 505           | 906             |  4050             |
-| Train    | 529       | 14724         | 4420          | 7147             |   53045            |
+|-------   |--------------|--------------|------------|-----------|----------------- |
+| Test     | 40        | 713           | 424           | 892             |  4226             |
+| Dev      | 30        | 875           | 505           | 933             |  4050             |
+| Train    | 529       | 14724         | 4420          | 7811             |   53045            |

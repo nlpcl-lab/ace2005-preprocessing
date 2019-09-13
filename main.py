@@ -50,10 +50,43 @@ def find_token_index(tokens, start_pos, end_pos, phrase):
     return start_idx, end_idx
 
 
-def find_token_index_v2(words, phrase):
-    start_idx, end_idx = -1, -1
+def verify_result(data):
+    def remove_punctuation(s):
+        for c in ['-LRB-', '-RRB-', '-LSB-', '-RSB-', '-LCB-', '-RCB-', '\xa0']:
+            s = s.replace(c, '')
+        s = re.sub(r'[^\w]', '', s)
+        return s
 
-    return start_idx, end_idx
+    def check_diff(words, phrase):
+        return remove_punctuation(phrase) not in remove_punctuation(words)
+
+    for item in data:
+        words = item['words']
+        for entity_mention in item['golden-entity-mentions']:
+            if check_diff(''.join(words[entity_mention['start']:entity_mention['end']]), entity_mention['text'].replace(' ', '')):
+                print('============================')
+                print('[Warning] entity has invalid start/end')
+                print('Expected: ', entity_mention['text'])
+                print('Actual:', words[entity_mention['start']:entity_mention['end']])
+                print('start: {}, end: {}, words: {}'.format(entity_mention['start'], entity_mention['end'], words))
+
+        for event_mention in item['golden-event-mentions']:
+            trigger = event_mention['trigger']
+            if check_diff(''.join(words[trigger['start']:trigger['end']]), trigger['text'].replace(' ', '')):
+                print('============================')
+                print('[Warning] trigger has invalid start/end')
+                print('Expected: ', trigger['text'])
+                print('Actual:', words[trigger['start']:trigger['end']])
+                print('start: {}, end: {}, words: {}'.format(trigger['start'], trigger['end'], words))
+            for argument in event_mention['arguments']:
+                if check_diff(''.join(words[argument['start']:argument['end']]), argument['text'].replace(' ', '')):
+                    print('============================')
+                    print('[Warning] argument has invalid start/end')
+                    print('Expected: ', argument['text'])
+                    print('Actual:', words[argument['start']:argument['end']])
+                    print('start: {}, end: {}, words: {}'.format(argument['start'], argument['end'], words))
+
+    print('Complete verification')
 
 
 def preprocessing(data_type, files):
@@ -109,10 +142,6 @@ def preprocessing(data_type, files):
                     end_pos=position[1] - sent_start_pos + 1,
                     phrase=entity_mention['text'],
                 )
-                # start_idx, end_idx = find_token_index_v2(
-                #     words=data['words'],
-                #     phrase=entity_mention['text'],
-                # )
 
                 entity_mention['start'] = start_idx
                 entity_mention['end'] = end_idx
@@ -131,10 +160,6 @@ def preprocessing(data_type, files):
                     end_pos=position[1] - sent_start_pos + 1,
                     phrase=event_mention['trigger']['text'],
                 )
-                # start_idx, end_idx = find_token_index_v2(
-                #     words=data['words'],
-                #     phrase=event_mention['trigger']['text'],
-                # )
 
                 event_mention['trigger']['start'] = start_idx
                 event_mention['trigger']['end'] = end_idx
@@ -151,10 +176,7 @@ def preprocessing(data_type, files):
                         end_pos=position[1] - sent_start_pos + 1,
                         phrase=argument['text'],
                     )
-                    # start_idx, end_idx = find_token_index_v2(
-                    #     words=data['words'],
-                    #     phrase=argument['text'],
-                    # )
+
                     argument['start'] = start_idx
                     argument['end'] = end_idx
                     del argument['position']
@@ -172,6 +194,7 @@ def preprocessing(data_type, files):
     print('entity :', entity_count)
     print('argument:', argument_count)
 
+    verify_result(result)
     with open('output/{}.json'.format(data_type), 'w') as f:
         json.dump(result, f, indent=2)
 
