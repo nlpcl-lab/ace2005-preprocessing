@@ -52,7 +52,7 @@ class Parser:
                     entity_map[entity_mention['entity-id']] = entity_mention
 
             for event_mention in self.event_mentions:
-                event_position = event_mention['position']
+                event_position = event_mention['trigger']['position']
                 if text_position[0] <= event_position[0] and event_position[1] <= text_position[1]:
                     event_arguments = []
                     for argument in event_mention['arguments']:

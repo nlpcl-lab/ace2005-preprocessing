@@ -1,5 +1,6 @@
 import os
 import copy
+import re
 from parser import Parser
 import json
 from stanfordcorenlp import StanfordCoreNLP
@@ -9,7 +10,6 @@ from tqdm import tqdm
 
 def get_data_paths(ace2005_path):
     test_files, dev_files, train_files = [], [], []
-
     with open('./data_list.csv', mode='r') as csv_file:
         rows = csv_file.readlines()
         for row in rows[1:]:
@@ -28,13 +28,30 @@ def get_data_paths(ace2005_path):
 
 
 def find_token_index(tokens, start_pos, end_pos, phrase):
-    start_idx = -1
+    start_idx, end_idx = -1, -1
     for idx, token in enumerate(tokens):
         if token['characterOffsetBegin'] <= start_pos:
             start_idx = idx
 
-    # Some of the ACE2005 data has annotation position errors.
-    end_idx = start_idx + len(phrase.split())
+    assert start_idx != -1, "start_idx: {}, start_pos: {}, phrase: {}, tokens: {}".format(start_idx, start_pos, phrase, tokens)
+    chars = ''
+
+    def remove_punc(s):
+        s = re.sub(r'[^\w]', '', s)
+        return s
+
+    for i in range(0, len(tokens) - start_idx):
+        chars += remove_punc(tokens[start_idx + i]['originalText'])
+        if remove_punc(phrase) in chars:
+            end_idx = start_idx + i + 1
+            break
+
+    assert end_idx != -1, "end_idx: {}, end_pos: {}, phrase: {}, tokens: {}, chars:{}".format(end_idx, end_pos, phrase, tokens, chars)
+    return start_idx, end_idx
+
+
+def find_token_index_v2(words, phrase):
+    start_idx, end_idx = -1, -1
 
     return start_idx, end_idx
 
@@ -59,10 +76,11 @@ def preprocessing(data_type, files):
             data['golden-event-mentions'] = []
 
             try:
-                nlp_text = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
-                nlp_res = json.loads(nlp_text)
+                nlp_res_raw = nlp.annotate(item['sentence'], properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
+                nlp_res = json.loads(nlp_res_raw)
             except Exception as e:
-                print('[Warning] StanfordCore Exception: ', nlp_text, 'This sentence will be ignored.')
+                print('[Warning] StanfordCore Exception: ', nlp_res_raw, 'This sentence will be ignored.')
+                print('If you want to include all sentences, please refer to this issue: https://github.com/nlpcl-lab/ace2005-preprocessing/issues/1')
                 continue
 
             tokens = nlp_res['sentences'][0]['tokens']
@@ -91,6 +109,10 @@ def preprocessing(data_type, files):
                     end_pos=position[1] - sent_start_pos + 1,
                     phrase=entity_mention['text'],
                 )
+                # start_idx, end_idx = find_token_index_v2(
+                #     words=data['words'],
+                #     phrase=entity_mention['text'],
+                # )
 
                 entity_mention['start'] = start_idx
                 entity_mention['end'] = end_idx
@@ -109,6 +131,10 @@ def preprocessing(data_type, files):
                     end_pos=position[1] - sent_start_pos + 1,
                     phrase=event_mention['trigger']['text'],
                 )
+                # start_idx, end_idx = find_token_index_v2(
+                #     words=data['words'],
+                #     phrase=event_mention['trigger']['text'],
+                # )
 
                 event_mention['trigger']['start'] = start_idx
                 event_mention['trigger']['end'] = end_idx
@@ -125,6 +151,10 @@ def preprocessing(data_type, files):
                         end_pos=position[1] - sent_start_pos + 1,
                         phrase=argument['text'],
                     )
+                    # start_idx, end_idx = find_token_index_v2(
+                    #     words=data['words'],
+                    #     phrase=argument['text'],
+                    # )
                     argument['start'] = start_idx
                     argument['end'] = end_idx
                     del argument['position']
@@ -155,6 +185,6 @@ if __name__ == '__main__':
     with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=60000) as nlp:
         # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
         # print(res)
-        preprocessing('train', train_files)
-        preprocessing('test', test_files)
         preprocessing('dev', dev_files)
+        preprocessing('test', test_files)
+        preprocessing('train', train_files)
