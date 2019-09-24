@@ -120,6 +120,6 @@ Below is information about the amount of parsed data when using this project. It
 
 |          | Documents    |  Sentences   |Triggers    | Arguments | Entity Mentions  |
 |-------   |--------------|--------------|------------|-----------|----------------- |
-| Test     | 40        | 713           | 424           | 892             |  4226             |
-| Dev      | 30        | 875           | 505           | 933             |  4050             |
-| Train    | 529       | 14724         | 4420          | 7811             |   53045            |
+| Test     | 40        | 713           | 422           | 892             |  4226             |
+| Dev      | 30        | 875           | 492           | 933             |  4050             |
+| Train    | 529       | 14724         | 4312          | 7811             |   53045            |
