@@ -6,7 +6,7 @@ Using the existing methods were complicated for me, so I made this project.
 
 ## Prerequisites
 
-1. Prepare **ACE 2005 dataset** 
+1. Prepare **ACE 2005 dataset**. 
 
    (Download: https://catalog.ldc.upenn.edu/LDC2006T06. Note that ACE 2005 dataset is not free.)
 
