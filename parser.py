@@ -43,11 +43,18 @@ class Parser:
 
             for entity_mention in self.entity_mentions:
                 entity_position = entity_mention['position']
+
                 if text_position[0] <= entity_position[0] and entity_position[1] <= text_position[1]:
+
                     item['golden-entity-mentions'].append({
                         'text': self.clean_text(entity_mention['text']),
                         'position': entity_position,
-                        'entity-type': entity_mention['entity-type']
+                        'entity-type': entity_mention['entity-type'],
+                        'head': {
+                            "text": self.clean_text(entity_mention['head']["text"]),
+                            "position": entity_mention["head"]["position"]
+                        },
+                        "entity_id": entity_mention['entity-id']
                     })
                     entity_map[entity_mention['entity-id']] = entity_mention
 
@@ -98,6 +105,8 @@ class Parser:
 
             entity_mention['position'][0] += offset
             entity_mention['position'][1] += offset
+            entity_mention['head']["position"][0] += offset
+            entity_mention['head']["position"][1] += offset
 
         for event_mention in self.event_mentions:
             offset1 = self.find_correct_offset(
@@ -176,13 +185,17 @@ class Parser:
             if child.tag != 'entity_mention':
                 continue
             extent = child[0]
+            head = child[1]
             charset = extent[0]
+            head_charset = head[0]
 
             entity_mention = dict()
             entity_mention['entity-id'] = child.attrib['ID']
             entity_mention['entity-type'] = '{}:{}'.format(node.attrib['TYPE'], node.attrib['SUBTYPE'])
             entity_mention['text'] = charset.text
             entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
+            entity_mention["head"] = {"text": head_charset.text,
+                                      "position": [int(head_charset.attrib['START']), int(head_charset.attrib['END'])]}
 
             entity_mentions.append(entity_mention)
 
@@ -239,6 +252,9 @@ class Parser:
 
             entity_mention['text'] = charset.text
             entity_mention['position'] = [int(charset.attrib['START']), int(charset.attrib['END'])]
+
+            entity_mention["head"] = {"text": charset.text,
+                                      "position": [int(charset.attrib['START']), int(charset.attrib['END'])]}
 
             entity_mentions.append(entity_mention)
 

@@ -1,54 +1,202 @@
 [
-  {
-    "sentence": "He visited all his friends.",
-    "tokens": ["He", "visited", "all", "his", "friends", "."],
-    "pos-tag": ["PRP", "VBD", "PDT", "PRP$", "NNS", "."],
-    "golden_entity_mentions": [
+    {
+    "sentence": "Earlier documents in the case have included embarrassing details about perks Welch received as part of his retirement package from GE at a time when corporate scandals were sparking outrage.",
+    "golden-entity-mentions": [
       {
-        "text": "He",
-        "entity_type": "PER:Individual",
-        "start": 0,
-        "end": 0
+        "text": "Welch",
+        "entity-type": "PER:Individual",
+        "head": {
+          "text": "Welch",
+          "start": 11,
+          "end": 12
+        },
+        "entity_id": "APW_ENG_20030325.0786-E24-38",
+        "start": 11,
+        "end": 12
       },
       {
         "text": "his",
-        "entity_type": "PER:Group",
-        "start": 3,
-        "end": 3
+        "entity-type": "PER:Individual",
+        "head": {
+          "text": "his",
+          "start": 16,
+          "end": 17
+        },
+        "entity_id": "APW_ENG_20030325.0786-E24-39",
+        "start": 16,
+        "end": 17
       },
       {
-        "text": "all his friends",
-        "entity_type": "PER:Group",
-        "start": 2,
-        "end": 5
+        "text": "GE",
+        "entity-type": "ORG:Commercial",
+        "head": {
+          "text": "GE",
+          "start": 20,
+          "end": 21
+        },
+        "entity_id": "APW_ENG_20030325.0786-E26-40",
+        "start": 20,
+        "end": 21
       }
     ],
-    "golden_event_mentions": [
+    "golden-event-mentions": [
       {
         "trigger": {
-          "text": "visited",
-          "start": 1,
-          "end": 1
+          "text": "retirement",
+          "start": 17,
+          "end": 18
         },
         "arguments": [
           {
-            "role": "Entity",
-            "entity_type": "PER:Individual",
-            "text": "He",
-            "start": 0,
-            "end": 0
+            "role": "Person",
+            "entity-type": "PER:Individual",
+            "text": "Welch",
+            "start": 11,
+            "end": 12
           },
           {
             "role": "Entity",
-            "entity_type": "PER:Group",
-            "text": "all his friends",
-            "start": 2,
-            "end": 5
+            "entity-type": "ORG:Commercial",
+            "text": "GE",
+            "start": 20,
+            "end": 21
           }
         ],
-        "event_type": "Contact:Meet"
+        "event_type": "Personnel:End-Position"
       }
     ],
-    "parse": "(ROOT\n  (S\n    (NP (PRP He))\n    (VP (VBD visited)\n      (NP (PDT all) (PRP$ his) (NNS friends)))\n    (. .)))"
+    "stanford-colcc": [
+      "ROOT/dep=6/gov=-1",
+      "amod/dep=0/gov=1",
+      "nsubj/dep=1/gov=6",
+      "case/dep=2/gov=4",
+      "det/dep=3/gov=4",
+      "nmod:in/dep=4/gov=1",
+      "aux/dep=5/gov=6",
+      "amod/dep=7/gov=8",
+      "dobj/dep=8/gov=6",
+      "case/dep=9/gov=10",
+      "nmod:about/dep=10/gov=6",
+      "nsubj/dep=11/gov=12",
+      "acl:relcl/dep=12/gov=10",
+      "case/dep=13/gov=14",
+      "nmod:as/dep=14/gov=12",
+      "case/dep=15/gov=18",
+      "nmod:poss/dep=16/gov=18",
+      "compound/dep=17/gov=18",
+      "nmod:of/dep=18/gov=14",
+      "case/dep=19/gov=20",
+      "nmod:from/dep=20/gov=12",
+      "case/dep=21/gov=23",
+      "det/dep=22/gov=23",
+      "nmod:at/dep=23/gov=12",
+      "advmod/dep=24/gov=28",
+      "amod/dep=25/gov=26",
+      "nsubj/dep=26/gov=28",
+      "aux/dep=27/gov=28",
+      "acl:relcl/dep=28/gov=23",
+      "dobj/dep=29/gov=28",
+      "punct/dep=30/gov=6"
+    ],
+    "words": [
+      "Earlier",
+      "documents",
+      "in",
+      "the",
+      "case",
+      "have",
+      "included",
+      "embarrassing",
+      "details",
+      "about",
+      "perks",
+      "Welch",
+      "received",
+      "as",
+      "part",
+      "of",
+      "his",
+      "retirement",
+      "package",
+      "from",
+      "GE",
+      "at",
+      "a",
+      "time",
+      "when",
+      "corporate",
+      "scandals",
+      "were",
+      "sparking",
+      "outrage",
+      "."
+    ],
+    "pos-tags": [
+      "JJR",
+      "NNS",
+      "IN",
+      "DT",
+      "NN",
+      "VBP",
+      "VBN",
+      "JJ",
+      "NNS",
+      "IN",
+      "NNS",
+      "NNP",
+      "VBD",
+      "IN",
+      "NN",
+      "IN",
+      "PRP$",
+      "NN",
+      "NN",
+      "IN",
+      "NNP",
+      "IN",
+      "DT",
+      "NN",
+      "WRB",
+      "JJ",
+      "NNS",
+      "VBD",
+      "VBG",
+      "NN",
+      "."
+    ],
+    "lemma": [
+      "earlier",
+      "document",
+      "in",
+      "the",
+      "case",
+      "have",
+      "include",
+      "embarrassing",
+      "detail",
+      "about",
+      "perk",
+      "Welch",
+      "receive",
+      "as",
+      "part",
+      "of",
+      "he",
+      "retirement",
+      "package",
+      "from",
+      "GE",
+      "at",
+      "a",
+      "time",
+      "when",
+      "corporate",
+      "scandal",
+      "be",
+      "spark",
+      "outrage",
+      "."
+    ],
+    "parse": "(ROOT\n  (S\n    (NP\n      (NP (JJR Earlier) (NNS documents))\n      (PP (IN in)\n        (NP (DT the) (NN case))))\n    (VP (VBP have)\n      (VP (VBN included)\n        (NP (JJ embarrassing) (NNS details))\n        (PP (IN about)\n          (NP\n            (NP (NNS perks))\n            (SBAR\n              (S\n                (NP (NNP Welch))\n                (VP (VBD received)\n                  (PP (IN as)\n                    (NP\n                      (NP (NN part))\n                      (PP (IN of)\n                        (NP (PRP$ his) (NN retirement) (NN package)))))\n                  (PP (IN from)\n                    (NP (NNP GE)))\n                  (PP (IN at)\n                    (NP\n                      (NP (DT a) (NN time))\n                      (SBAR\n                        (WHADVP (WRB when))\n                        (S\n                          (NP (JJ corporate) (NNS scandals))\n                          (VP (VBD were)\n                            (VP (VBG sparking)\n                              (NP (NN outrage)))))))))))))))\n    (. .)))"
   }
 ]

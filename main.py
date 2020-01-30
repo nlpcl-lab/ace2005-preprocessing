@@ -6,6 +6,7 @@ import json
 from stanfordcorenlp import StanfordCoreNLP
 import argparse
 from tqdm import tqdm
+import traceback
 
 
 def get_data_paths(ace2005_path):
@@ -148,6 +149,20 @@ def preprocessing(data_type, files):
 
                 del entity_mention['position']
 
+                # head
+                head_position = entity_mention["head"]["position"]
+
+                head_start_idx, head_end_idx = find_token_index(
+                    tokens=tokens,
+                    start_pos=head_position[0] - sent_start_pos,
+                    end_pos=head_position[1] - sent_start_pos + 1,
+                    phrase=entity_mention["head"]["text"]
+                )
+
+                entity_mention["head"]["start"] = head_start_idx
+                entity_mention["head"]["end"] = head_end_idx
+                del entity_mention["head"]["position"]
+
                 data['golden-entity-mentions'].append(entity_mention)
 
             for event_mention in item['golden-event-mentions']:
@@ -202,10 +217,11 @@ def preprocessing(data_type, files):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', help="Path of ACE2005 English data", default='./data/ace_2005_td_v7/data/English')
+    parser.add_argument('--nlp', help="Standford Core Nlp path", default='./stanford-corenlp-full-2018-10-05')
     args = parser.parse_args()
     test_files, dev_files, train_files = get_data_paths(args.data)
 
-    with StanfordCoreNLP('./stanford-corenlp-full-2018-10-05', memory='8g', timeout=60000) as nlp:
+    with StanfordCoreNLP(args.nlp, memory='8g', timeout=60000) as nlp:
         # res = nlp.annotate('Donald John Trump is current president of the United States.', properties={'annotators': 'tokenize,ssplit,pos,lemma,parse'})
         # print(res)
         preprocessing('dev', dev_files)
